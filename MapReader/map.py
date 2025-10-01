@@ -1,4 +1,5 @@
-# MapReader/map.py
+# MapReader/h3_input_stream.py
+
 
 from typing import List, Dict
 from bitset import BitSet  # наш предыдущий класс BitSet
