@@ -3,7 +3,7 @@
 from typing import List, Dict
 from bitset import BitSet  # наш предыдущий класс BitSet
 from player import Player  # нужно будет переписать Player.py
-from tile import Tile      # нужно будет переписать Tile.py
+from tile import Tile  # нужно будет переписать Tile.py
 from map_object import MapObject  # нужно будет переписать MapObject.py
 
 
@@ -11,7 +11,7 @@ class Map:
     class Version:
         Unknown = 0
         ROE = 0x0E  # 14
-        AB = 0x15   # 21
+        AB = 0x15  # 21
         SOD = 0x1C  # 28
         WOG = 0x33  # 51
 

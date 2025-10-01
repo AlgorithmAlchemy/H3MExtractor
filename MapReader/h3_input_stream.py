@@ -3,6 +3,7 @@
 import io
 import struct
 
+
 class H3InputStream:
     def __init__(self, stream: io.BufferedReader):
         self.stream = stream

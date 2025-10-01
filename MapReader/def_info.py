@@ -2,6 +2,7 @@
 
 from .bits import BitSet
 
+
 class DefInfo:
     def __init__(self):
         self.sprite_name: str = ""

@@ -2,6 +2,7 @@
 
 from bitarray import bitarray
 
+
 def convert_from_long(value: int) -> bitarray:
     """Converts a long integer to a bitarray (BitSet equivalent)."""
     bits = bitarray()
