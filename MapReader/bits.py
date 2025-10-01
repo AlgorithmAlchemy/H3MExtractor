@@ -1,4 +1,5 @@
 # MapReader/bits.py
+from typing import Set
 
 from bitarray import bitarray
 
@@ -50,6 +51,18 @@ class BitSet:
         while value:
             if value & 1:
                 bits.set(i, True)
+            value >>= 1
+            i += 1
+        return bits
+
+    @staticmethod
+    def convert(value: int) -> Set[int]:
+        """Convert int to a set of bit indices."""
+        bits = set()
+        i = 0
+        while value:
+            if value & 1:
+                bits.add(i)
             value >>= 1
             i += 1
         return bits

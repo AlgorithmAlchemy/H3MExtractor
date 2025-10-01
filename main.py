@@ -1,20 +1,22 @@
-# command_app.py
+# main.py
 
 import sys
 import json
 from pathlib import Path
 from bitarray import bitarray
-from map_reader import MapReader  # предполагаем, что MapReader будет отдельным модулем на Python
+from MapReader.map_reader import MapReader
+
 
 class BitSetSerializer(json.JSONEncoder):
     """Serializer for BitSet-like objects (bitarray)."""
+
     def default(self, obj):
         if isinstance(obj, bitarray):
             # Преобразуем в массив чисел типа long (64-бит)
             long_array = []
             bits = obj.tolist()
             for i in range(0, len(bits), 64):
-                chunk = bits[i:i+64]
+                chunk = bits[i:i + 64]
                 value = 0
                 for bit_index, bit in enumerate(chunk):
                     if bit:

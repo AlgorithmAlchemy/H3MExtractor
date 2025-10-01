@@ -6,10 +6,12 @@ from typing import List, Optional
 
 from .h3_input_stream import H3InputStream
 from .map import Map, Version
+
 from .player import Player
 from .tile import Tile
 from .def_info import DefInfo
-from .bits import Bits
+from MapReader.bits import BitSet
+from .map_object import MapObject
 
 
 class MapReader:
@@ -117,7 +119,7 @@ class MapReader:
                 player.is_towns_set = True
 
             # allowed towns bitset
-            towns_bits = Bits.convert(self.stream.read_int(1 if self.map.version == Version.ROE else 2))
+            towns_bits = BitSet.convert(self.stream.read_int(1 if self.map.version == Version.ROE else 2))
             for j in range(9):
                 if j in towns_bits:
                     player.allowed_towns.append(Player.Town(j))
@@ -236,7 +238,7 @@ class MapReader:
             tile.road_image_index = self.stream.read_int(1)
 
             mirror_conf = self.stream.read_byte()
-            tile.flip_conf = Bits.convert(mirror_conf)
+            tile.flip_conf = BitSet.convert(mirror_conf)
             self.map.tiles.append(tile)
 
     # ---------- DEF INFO ----------
@@ -246,8 +248,8 @@ class MapReader:
         for _ in range(defs_count):
             d = DefInfo()
             d.sprite_name = self.stream.read_string()
-            d.passable_cells = Bits.convert((self.stream.read_int(4) << 32) | (self.stream.read_int(2) & 0xFFFFFFF))
-            d.active_cells = Bits.convert((self.stream.read_int(4) << 32) | (self.stream.read_int(2) & 0xFFFFFFF))
+            d.passable_cells = BitSet.convert((self.stream.read_int(4) << 32) | (self.stream.read_int(2) & 0xFFFFFFF))
+            d.active_cells = BitSet.convert((self.stream.read_int(4) << 32) | (self.stream.read_int(2) & 0xFFFFFFF))
             self.stream.skip(2)  # terrain type
             self.stream.skip(2)  # terrain group
             d.object_id = self.stream.read_int(4)

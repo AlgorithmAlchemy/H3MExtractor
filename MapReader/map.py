@@ -1,30 +1,30 @@
-# MapReader/h3_input_stream.py
-
+# MapReader/map.py
 
 from typing import List, Dict
-from bitset import BitSet  # наш предыдущий класс BitSet
-from player import Player  # нужно будет переписать Player.py
-from tile import Tile  # нужно будет переписать Tile.py
-from map_object import MapObject  # нужно будет переписать MapObject.py
+from MapReader.bits import BitSet
+from MapReader.player import Player
+from MapReader.tile import Tile
+from MapReader.map_object import MapObject
+
+
+class Version:
+    UNKNOWN = 0
+    ROE = 0x0E
+    AB = 0x15
+    SOD = 0x1C
+    WOG = 0x33
+
+    @staticmethod
+    def from_int(value: int):
+        for name, val in Version.__dict__.items():
+            if not name.startswith("__") and val == value:
+                return val
+        return Version.UNKNOWN
 
 
 class Map:
-    class Version:
-        Unknown = 0
-        ROE = 0x0E  # 14
-        AB = 0x15  # 21
-        SOD = 0x1C  # 28
-        WOG = 0x33  # 51
-
-        @staticmethod
-        def from_int(value: int):
-            for v_name, v_value in Map.Version.__dict__.items():
-                if not v_name.startswith("__") and v_value == value:
-                    return v_value
-            return Map.Version.Unknown
-
     def __init__(self):
-        self.version: int = Map.Version.Unknown
+        self.version: int = Version.UNKNOWN
         self.size: int = 0
         self.has_underground: bool = False
         self.title: str = ""
