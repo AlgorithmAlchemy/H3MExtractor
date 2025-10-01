@@ -1,9 +1,63 @@
-# main.py
+# command_app.py
 
-from extractor.map_reader import H3MParser
+import sys
+import json
+from pathlib import Path
+from bitarray import bitarray
+from map_reader import MapReader  # предполагаем, что MapReader будет отдельным модулем на Python
+
+class BitSetSerializer(json.JSONEncoder):
+    """Serializer for BitSet-like objects (bitarray)."""
+    def default(self, obj):
+        if isinstance(obj, bitarray):
+            # Преобразуем в массив чисел типа long (64-бит)
+            long_array = []
+            bits = obj.tolist()
+            for i in range(0, len(bits), 64):
+                chunk = bits[i:i+64]
+                value = 0
+                for bit_index, bit in enumerate(chunk):
+                    if bit:
+                        value |= 1 << bit_index
+                long_array.append(value)
+            return long_array
+        return super().default(obj)
+
+
+def is_homm_map_file(path: Path) -> bool:
+    return path.suffix.lower() == ".h3m"
+
+
+def write_to_json_safe(path: Path, output_folder: Path):
+    try:
+        write_to_json(path, output_folder)
+    except Exception as e:
+        print(f"Error processing {path}: {e}")
+
+
+def write_to_json(path: Path, output_folder: Path):
+    print(path.name)
+    output_name = output_folder / f"{path.name}.json"
+    with path.open("rb") as f:
+        map_reader = MapReader(f)
+        map_obj = map_reader.read()
+    with output_name.open("w", encoding="utf-8") as f:
+        json.dump(map_obj, f, indent=4, cls=BitSetSerializer)
+
+
+def main():
+    if len(sys.argv) < 3:
+        print("Bad arguments")
+        sys.exit(1)
+
+    input_folder = Path(sys.argv[1])
+    output_folder = Path(sys.argv[2])
+    output_folder.mkdir(parents=True, exist_ok=True)
+
+    for path in input_folder.rglob("*"):
+        if path.is_file() and is_homm_map_file(path):
+            write_to_json_safe(path, output_folder)
+
 
 if __name__ == "__main__":
-    file_path = "maps/[HotA] A Cold Day in Hell.h3m"
-    parser = H3MParser(file_path)
-    parser.parse()
-    print(parser.to_json())
+    main()
