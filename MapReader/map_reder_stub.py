@@ -41,13 +41,29 @@ class MapReaderStub:
 
 # ----------------- Отладка -----------------
 if __name__ == "__main__":
-    import os
+    import sys
+    from pathlib import Path
 
-    map_file = os.path.join("..\Maps", "One Bad Day - Allied.h3m")
-    try:
-        with open(map_file, "rb") as f:
-            reader = MapReaderStub(f)
-            map_info = reader.read()
-            print(f"Map size: {map_info.size}, version: {map_info.version}")
-    except Exception as e:
-        print(f"Error reading map: {e}")
+    # Если запуск без аргументов, ищем все .h3m в папке Maps
+    if len(sys.argv) == 1:
+        maps_folder = Path("../Maps")
+    else:
+        maps_folder = Path(sys.argv[1])
+
+    if not maps_folder.exists() or not maps_folder.is_dir():
+        print(f"Folder {maps_folder} does not exist")
+        sys.exit(1)
+
+    h3m_files = list(maps_folder.glob("*.h3m"))
+    if not h3m_files:
+        print(f"No .h3m files found in {maps_folder}")
+        sys.exit(1)
+
+    for map_file in h3m_files:
+        try:
+            with open(map_file, "rb") as f:
+                reader = MapReaderStub(f)
+                map_info = reader.read()
+                print(f"{map_file.name}: size={map_info.size}, version={map_info.version}")
+        except Exception as e:
+            print(f"{map_file.name}: Error reading map: {e}")
