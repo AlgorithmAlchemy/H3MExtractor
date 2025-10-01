@@ -2,10 +2,11 @@
 
 import io
 import struct
+from typing import BinaryIO
 
 
 class H3InputStream(io.BufferedReader):
-    def __init__(self, raw: io.RawIOBase):
+    def __init__(self, raw: BinaryIO):
         super().__init__(raw)
         self.buffer: bytes = b""
         self.pos: int = 0
@@ -14,7 +15,7 @@ class H3InputStream(io.BufferedReader):
     @staticmethod
     def to_int(b: bytes, byte_count: int) -> int:
         if byte_count == 1:
-            return struct.unpack("<b", b)[0] & 0xFF  # как в Java: unsigned byte
+            return struct.unpack("<B", b)[0]  # unsigned byte
         elif byte_count == 2:
             return struct.unpack("<h", b)[0]
         elif byte_count == 4:
@@ -40,8 +41,15 @@ class H3InputStream(io.BufferedReader):
         length = self._read_string_length()
         if length > 64000:
             raise IOError(f"Read String is too long: {length}")
+        if length == 0:
+            return ""
+
         data = self.read_bytes(length)
-        return data.decode("utf-8")
+        # пробуем cp1251, если не получилось — latin1
+        try:
+            return data.decode("cp1251")
+        except UnicodeDecodeError:
+            return data.decode("latin-1", errors="replace")
 
     def read_bytes(self, length: int) -> bytes:
         data = super().read(length)

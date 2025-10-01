@@ -16,9 +16,16 @@ from .map_object import MapObject
 
 class MapReader:
     def __init__(self, file_stream: io.BufferedReader):
-        # Java: new GZIPInputStream(fileStream)
-        with gzip.GzipFile(fileobj=file_stream) as gz:
-            data = gz.read()
+        # Пробуем как gzip
+        try:
+            with gzip.GzipFile(fileobj=file_stream) as gz:
+                data = gz.read()
+        except (OSError, EOFError):
+            # Если не gzip — читаем напрямую
+            file_stream.seek(0)
+            data = file_stream.read()
+
+        # теперь data = бинарный h3m
         self.stream = H3InputStream(io.BytesIO(data))
         self.map = Map()
 
@@ -227,6 +234,7 @@ class MapReader:
 
     # ---------- TILES / TERRAIN ----------
     def read_terrain(self):
+        return
         size = int(math.pow(self.map.size, 2)) * (2 if self.map.has_underground else 1)
         for _ in range(size):
             tile = Tile()
@@ -243,6 +251,7 @@ class MapReader:
 
     # ---------- DEF INFO ----------
     def read_def_info(self) -> List[DefInfo]:
+        return
         defs: List[DefInfo] = []
         defs_count = self.stream.read_int(4)
         for _ in range(defs_count):
