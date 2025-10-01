@@ -62,4 +62,18 @@ def main():
 
 
 if __name__ == "__main__":
+    if len(sys.argv) == 1:  # запуск без аргументов (например, из PyCharm)
+        maps_folder = Path("Maps")
+        # Найти первый .h3m файл в папке Maps
+        first_map = next(maps_folder.glob("*.h3m"), None)
+        if first_map is None:
+            print("No .h3m files found in Maps folder for debug run")
+            sys.exit(1)
+
+        sys.argv.extend([
+            str(first_map.parent),  # входная папка
+            "Output"                # папка для результата
+        ])
+        print(f"[DEBUG] Using map {first_map.name}")
+
     main()
